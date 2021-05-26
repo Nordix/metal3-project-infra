@@ -133,14 +133,23 @@ else
   git checkout "${METAL3BRANCH}"
 fi
 
-if [[ "${TESTS_FOR}" == "feature_tests_upgrade"* ]]
+if [[ ${BARE_METAL_LAB} != "true" ]]
 then
-  export NODE_DRAIN_TIMEOUT="300s"
-  make "${TESTS_FOR}"
-elif [[ "${TESTS_FOR}" == "feature_tests" || "${TESTS_FOR}" == "feature_tests_centos" ]]
-then
-  make feature_tests
+  if [[ "${TESTS_FOR}" == "feature_tests_upgrade"* ]]
+  then
+    export NODE_DRAIN_TIMEOUT="300s"
+    make "${TESTS_FOR}"
+  elif [[ "${TESTS_FOR}" == "feature_tests" || "${TESTS_FOR}" == "feature_tests_centos" ]]
+  then
+    make feature_tests
+  else
+    make
+    make test
+  fi
 else
-  make
+  # See bare metal lab infrastructure documentation:
+  # https://wiki.nordix.org/pages/viewpage.action?spaceKey=CPI&title=Bare+Metal+Lab
+  # In the bare metal lab, the external network has vlan id 3
+  export EXTERNAL_VLAN_ID="3"
   make test
 fi
