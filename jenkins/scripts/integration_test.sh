@@ -27,11 +27,11 @@ else
   IMAGE_NAME="${CI_METAL3_CENTOS_IMAGE}"
 fi
 
-REPO_ORG="${REPO_ORG:-metal3-io}"
+REPO_ORG="${REPO_ORG:-Nordix}"
 REPO_NAME="${REPO_NAME:-metal3-dev-env}"
-REPO_BRANCH="${REPO_BRANCH}"
+REPO_BRANCH="remove-apt-key--ansible-module"
 UPDATED_REPO="${UPDATED_REPO:-https://github.com/${REPO_ORG}/${REPO_NAME}.git}"
-UPDATED_BRANCH="${UPDATED_BRANCH:-main}"
+UPDATED_BRANCH="${UPDATED_BRANCH:-remove-apt-key--ansible-module}"
 CAPI_VERSION="${CAPI_VERSION:-v1beta1}"
 CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
 CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
