@@ -111,7 +111,7 @@ pipeline {
           environment {
             TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-pivoting-based"
             BUILD_TAG = "${env.BUILD_TAG}-pivoting-based"
-            GINKGO_FOCUS = "ephemeral"
+            GINKGO_FOCUS = "pivoting"
           }
 
           steps {
@@ -243,7 +243,8 @@ pipeline {
           environment {
             TEST_EXECUTER_VM_NAME = "${TEST_EXECUTER_VM_NAME}-live-iso"
             BUILD_TAG = "${env.BUILD_TAG}-live-iso"
-            GINKGO_FOCUS = "live-iso"
+            GINKGO_FOCUS = "features"
+            GINKGO_SKIP = "pivoting remediation"
 
           }
           steps {
