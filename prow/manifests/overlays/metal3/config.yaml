@@ -343,7 +343,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
   Nordix/metal3-dev-tools:
     - name: shellcheck
@@ -387,7 +387,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
   metal3-io/baremetal-operator:
     - name: gofmt
@@ -433,6 +433,26 @@ presubmits:
             image: docker.io/golang:1.20
             imagePullPolicy: Always
     - name: markdownlint
+      branches:
+        - main
+      run_if_changed: '(\.md|markdownlint\.sh)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/markdownlint.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
+            imagePullPolicy: Always
+    - name: markdownlint
+      branches:
+        - release-0.5
+        - release-0.4
+        - release-0.3
       run_if_changed: '(\.md|markdownlint\.sh)$'
       decorate: true
       spec:
@@ -686,6 +706,26 @@ presubmits:
             image: docker.io/golang:1.19
             imagePullPolicy: Always
     - name: markdownlint
+      branches:
+        - main
+      run_if_changed: '(\.md|markdownlint\.sh)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/markdownlint.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
+            imagePullPolicy: Always
+    - name: markdownlint
+      branches:
+        - release-1.6
+        - release-1.5
+        - release-1.4
       run_if_changed: '(\.md|markdownlint\.sh)$'
       decorate: true
       spec:
@@ -845,7 +885,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
     - name: shellcheck
       run_if_changed: '((\.sh)|^Makefile)$'
@@ -889,7 +929,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
 
   metal3-io/project-infra:
@@ -922,7 +962,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
     - name: shellcheck
       run_if_changed: '((\.sh)|^Makefile)$'
@@ -952,7 +992,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
 
   metal3-io/ip-address-manager:
@@ -1106,7 +1146,27 @@ presubmits:
             image: docker.io/golang:1.19
             imagePullPolicy: Always
     - name: markdownlint
+      branches:
+        - main
       run_if_changed: '(\.md|markdownlint\.sh)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/markdownlint.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
+            imagePullPolicy: Always
+    - name: markdownlint
+      run_if_changed: '(\.md|markdownlint\.sh)$'
+      branches:
+        - release-1.6
+        - release-1.5
+        - release-1.4
       decorate: true
       spec:
         containers:
@@ -1243,7 +1303,37 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
+            imagePullPolicy: Always
+
+  metal3-io/ironic-client:
+    - name: shellcheck
+      run_if_changed: '((\.sh)|^Makefile)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/shellcheck.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/koalaman/shellcheck-alpine:v0.9.0@sha256:e19ed93c22423970d56568e171b4512c9244fc75dd9114045016b4a0073ac4b7
+            imagePullPolicy: Always
+    - name: markdownlint
+      run_if_changed: '(\.md|markdownlint\.sh)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/markdownlint.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
 
   metal3-io/ironic-image:
@@ -1262,6 +1352,24 @@ presubmits:
             image: docker.io/koalaman/shellcheck-alpine:v0.9.0@sha256:e19ed93c22423970d56568e171b4512c9244fc75dd9114045016b4a0073ac4b7
             imagePullPolicy: Always
     - name: markdownlint
+      branches:
+        - main
+      run_if_changed: '(\.md|markdownlint\.sh)$'
+      decorate: true
+      spec:
+        containers:
+          - args:
+              - ./hack/markdownlint.sh
+            command:
+              - sh
+            env:
+              - name: IS_CONTAINER
+                value: "TRUE"
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
+            imagePullPolicy: Always
+    - name: markdownlint
+      branches:
+        - release-23.1
       run_if_changed: '(\.md|markdownlint\.sh)$'
       decorate: true
       spec:
@@ -1303,7 +1411,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
 
   metal3-io/ironic-hardware-inventory-recorder-image:
@@ -1333,7 +1441,7 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always
 
   metal3-io/utility-images:
@@ -1363,5 +1471,5 @@ presubmits:
             env:
               - name: IS_CONTAINER
                 value: "TRUE"
-            image: docker.io/pipelinecomponents/markdownlint:0.13.0@sha256:9c0cdfb64fd3f1d3bdc5181629b39c2e43b6a52fc9fdc146611e1860845bbae0
+            image: docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928
             imagePullPolicy: Always

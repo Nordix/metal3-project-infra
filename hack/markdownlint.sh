@@ -6,14 +6,13 @@ IS_CONTAINER="${IS_CONTAINER:-false}"
 CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-podman}"
 
 if [ "${IS_CONTAINER}" != "false" ]; then
-    TOP_DIR="${1:-.}"
-    find "${TOP_DIR}" -type d \( -path ./vendor -o -path ./.github \) -prune -o -name '*.md' -exec mdl --style all --warnings {} \+
+    markdownlint-cli2 "**/*.md" "#node_modules"
 else
     "${CONTAINER_RUNTIME}" run --rm \
         --env IS_CONTAINER=TRUE \
         --volume "${PWD}:/workdir:ro,z" \
         --entrypoint sh \
         --workdir /workdir \
-        docker.io/pipelinecomponents/markdownlint:0.12.0@sha256:0b8f9fcf0410257b2f3548f67ffe25934cfc9877a618b9f85afcf345a25804a2 \
+        docker.io/pipelinecomponents/markdownlint-cli2:0.8.1@sha256:7f85faca10c33e9104e0e461c2a1d59a997a52b22358548dd7975498c8311928 \
         /workdir/hack/markdownlint.sh "$@"
 fi
