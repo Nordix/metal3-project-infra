@@ -44,8 +44,30 @@
 
 - name: Add interface to provisioning bridge
   shell:
-    cmd: "brctl addif provisioning eno1"
+    cmd: "brctl addif provisioning pro"
   become: true
+
+- name: Set VLAN 3 interface to be up
+  shell:
+    cmd: "ip link set up dev ext"
+  become: true
+  tags: ext
+
+- name: Check if ext interface has been added to bridge
+  shell:
+    cmd: "brctl show external | grep ext"
+  become: true
+  failed_when: false
+  changed_when: false
+  register: brctl_grep_ext
+  tags: ext
+
+- name: Add VLAN 3 interface to external bridge
+  shell:
+    cmd: "brctl addif external ext"
+  become: true
+  when: brctl_grep_ext.rc != 0
+  tags: ext
 
 - name: Deploy bmhosts
   template:
@@ -57,28 +79,6 @@
     cmd: kubectl apply -f ./bmhosts_crs.yaml -n metal3
     chdir: "/opt/metal3-dev-env/"
   tags: kubectl_apply
-
-- name: Set VLAN 3 interface to be up
-  shell:
-    cmd: "ip link set up dev bmext"
-  become: true
-  tags: bmext
-
-- name: Check if bmext interface has been added to bridge
-  shell:
-    cmd: "brctl show external | grep bmext"
-  become: true
-  failed_when: false
-  changed_when: false
-  register: brctl_grep_bmext
-  tags: bmext
-
-- name: Add VLAN 3 interface to external bridge
-  shell:
-    cmd: "brctl addif external bmext"
-  become: true
-  when: brctl_grep_bmext.rc != 0
-  tags: bmext
 
 - name: Wait until all BMHs become available .
   kubernetes.core.k8s_info:
