@@ -26,21 +26,20 @@ source "${current_dir}/upload-ci-image.sh"
 sudo sed -i "s/^#\$nrconf{restart} = 'i';/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf > /dev/null || true
 
 sudo apt-get update
-sudo apt-get install python3-pip qemu qemu-kvm -y
-sudo pip3 install diskimage-builder python-openstackclient
-sudo -H pip install virtualenv
+sudo apt-get install python3-dev python3-pip python3-venv qemu qemu-kvm -y
+python3 -m venv venv
+# shellcheck disable=SC1091
+source venv/bin/activate
+pip install diskimage-builder python-openstackclient
 
 # sudo pip3 install diskimage-builder python-openstackclient
 mkdir "${current_dir}/dib"
 pushd "${current_dir}/dib"
-virtualenv env
-# shellcheck disable=SC1091
-source env/bin/activate
 
 git clone https://opendev.org/openstack/diskimage-builder || true
 cd diskimage-builder
 git checkout 3.33.0
-sudo pip install --no-cache-dir -e .
+pip install --no-cache-dir -e .
 
 popd
 

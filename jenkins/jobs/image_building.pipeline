@@ -1,6 +1,6 @@
 ci_git_credential_id = "metal3-jenkins-github-username-token"
-ci_git_branch = "main"
-ci_git_url = "https://github.com/metal3-io/project-infra.git"
+ci_git_branch = "mquhuy/debug-node-image-build"
+ci_git_url = "https://github.com/Nordix/project-infra.git"
 
 pipeline {
   agent none
@@ -20,7 +20,7 @@ pipeline {
         axes {
           axis {
             name 'IMAGE_OS'
-            values 'ubuntu', 'centos'
+            values 'centos'
           }
         }
         environment {

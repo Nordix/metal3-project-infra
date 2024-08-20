@@ -6,7 +6,7 @@ verify_node_image() {
     current_dir="$(dirname "$(readlink -f "${0}")")"
     REPO_ROOT="$(realpath "${current_dir}/../..")"
 
-    img_name="$1"
+    img_name="${1:-}"
     IMAGE_DIR="${2:-"${REPO_ROOT}"}"
 
     # So that no extra components are built later
@@ -16,10 +16,17 @@ verify_node_image() {
     export CLEANUP_AFTERWARDS="${CLEANUP_AFTERWARDS:-false}"
 
     # Tests expect the image name to have the file type extension 
-    export IMAGE_NAME="${img_name}.qcow2"
     export IMAGE_OS="${IMAGE_OS}"
     export IMAGE_TYPE="${IMAGE_TYPE}"
-    export IMAGE_LOCATION="${IMAGE_DIR}"
+
+    if [[ ${img_name} != "" ]]; then
+        export IMAGE_LOCATION="${IMAGE_DIR}"
+        export IMAGE_NAME="${img_name}.qcow2"
+        if [[ ! -f "${IMAGE_LOCATION}/${IMAGE_NAME}" ]]; then
+            echo "IMAGE ${IMAGE_LOCATION}/${IMAGE_NAME} not exists"
+            exit 1
+        fi
+    fi
 
     # Similar config to periodic integration tests
     export REPO_BRANCH="main"
