@@ -18,6 +18,11 @@ on:
         description: "The directory where the dockerfile locates, as relative to the repo root"
         type: string
         default: .
+      dockerfile-filename:
+        required: false
+        description: "Name of the Dockerfile. Default to be 'Dockerfile'"
+        type: string
+        default: Dockerfile
       pushImage:
         required: false
         description: "Whether to push the image afterwards"
@@ -66,7 +71,7 @@ jobs:
         image: metal3-io/${{ inputs.image-name }}
         tags: ${{ env.IMAGE_TAGS }}
         directory: ${{ inputs.dockerfile-directory }}
-        dockerfile: ${{ inputs.dockerfile-directory }}/Dockerfile
+        dockerfile: ${{ inputs.dockerfile-directory }}/${{ inputs.dockerfile-filename }}
         registry: quay.io
         username: ${{ secrets.QUAY_USERNAME }}
         password: ${{ secrets.QUAY_PASSWORD }}
