@@ -1,0 +1,11 @@
+#!/bin/bash
+# This file is used to provide a test configuration for the
+# unlock-mount-luks.sh
+
+root_device_path="${CRYPT_ROOT_DEV:-}"
+auth="${CRYPT_AUTH:-pcr:sh256:0}"
+secret_address="${SECRET_ADDRESS:-}"
+key_script="${KEY_SCRIPT:-}"
+config_drive_part_num="${CONFIG_PART_NUM:-}"
+preparation_timeout="${PREP_TIMEOUT:-2}"
+dry_run="${DRY_RUN:-true}"
