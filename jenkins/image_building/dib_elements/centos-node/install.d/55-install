@@ -19,5 +19,7 @@ net.ipv4.ip_forward                 = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
+sudo yum remove crun -y
 sudo yum install -y container-selinux
 sudo yum install -y kubelet-"${KUBERNETES_BINARIES_VERSION//v}" kubeadm-"${KUBERNETES_BINARIES_VERSION//v}" kubectl-"${KUBERNETES_BINARIES_VERSION//v}" cri-o-"${CRIO_BINARIES_VERSION//v}" cri-tools-"${CRICTL_BINARIES_VERSION//v}"
+sudo yum install crun -y
