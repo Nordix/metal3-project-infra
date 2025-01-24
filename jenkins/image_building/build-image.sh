@@ -29,6 +29,14 @@ sudo apt-get update
 sudo apt-get install -y python3-dev python3-pip python3-venv qemu qemu-kvm
 python3 -m venv venv
 
+echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28:/1.28.4/xUbuntu_22.04/ /" | sudo tee /etc/apt/sources.list.d/cri-o.list
+curl -fsSL https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28:/1.28.4/xUbuntu_22.04/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+
+echo "deb [signed-by=/etc/apt/keyrings/devel_kubic_libcontainers_stable.gpg] https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_22.04/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_22.04/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/devel_kubic_libcontainers_stable.gpg
+
+sudo apt update
+
 # shellcheck source=/dev/null
 . venv/bin/activate
 pip install --no-cache-dir diskimage-builder==3.33.0

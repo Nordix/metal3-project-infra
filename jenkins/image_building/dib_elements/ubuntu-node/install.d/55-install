@@ -16,6 +16,10 @@ net.ipv4.ip_forward                 = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
+curl -fsSL https://download.opensuse.org/repositories/isv:/kubernetes:/addons:/cri-o:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/kubernetes:/addons:/cri-o:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/cri-o.list
+sudo apt update
+
 KUBERNETES_DEB_VERSION="${KUBERNETES_VERSION//v}"-\*
 CRIO_DEB_VERSION="${CRIO_VERSION//v}"-\*
 CRICTL_DEB_VERSION="${CRICTL_VERSION//v}"-\*
