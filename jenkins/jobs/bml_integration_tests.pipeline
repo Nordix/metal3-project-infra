@@ -43,6 +43,7 @@ pipeline {
     NUM_NODES = 2
     CAPI_VERSION = "v1beta1"
     CAPM3_VERSION = "v1beta1"
+    IMAGE_OS = "ubuntu"
   }
   stages {
     stage('SCM') {
