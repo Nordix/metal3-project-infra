@@ -3,6 +3,22 @@
     msg: Ensure that BML_ILO_USERNAME, BML_ILO_PASSWORD and GITHUB_TOKEN environment variables are set
   when: not bml_ilo_username or not bml_ilo_password or not github_token
 
+- name: Run shell script that uses NUM_NODES
+  ansible.builtin.shell: |
+    #!/bin/bash
+    echo "NUM_NODES from shell script: $NUM_NODES"
+    echo "WORKER_MACHINE_COUNT from shell script: $WORKER_MACHINE_COUNT"
+    echo "CONTROL_PLANE_MACHINE_COUNT from shell script: $CONTROL_PLANE_MACHINE_COUNT"
+    # Your other script logic using $NUM_NODES
+
+- name: Print all Ansible variables
+  ansible.builtin.debug:
+    var: vars
+
+- name: Print expected_num_nodes
+  debug:
+    var: expected_num_nodes
+
 - name: Install dependencies for metal3-dev-env and hpilo_boot
   apt:
     pkg:
