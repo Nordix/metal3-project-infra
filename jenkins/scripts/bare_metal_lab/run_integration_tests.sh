@@ -33,14 +33,18 @@ fi
 # In the bare metal lab, we have already cloned metal3-dev-env and we run integration tests
 # so no need to clone other repos.
 if [[ "${REPO_NAME}" == "metal3-dev-env" ]]; then
-    cd "${HOME}/tested_repo"
+    METAL3_DIR=${HOME}/tested_repo
 else
-    cd "${HOME}/metal3"
+    METAL3_DIR="${HOME}/metal3"
 fi
 
+cd "${METAL3_DIR}/"
 # See bare metal lab infrastructure documentation:
 # https://wiki.nordix.org/pages/viewpage.action?spaceKey=CPI&title=Bare+Metal+Lab
 # In the bare metal lab, the external network has vlan id 3
 export EXTERNAL_VLAN_ID="3"
 
-make test
+# shellcheck disable=SC1090,SC1091
+source "${METAL3_DIR}/lib/common.sh"
+export ACTION="ci_test_provision"
+"${METAL3_DIR}"/tests/run.sh
