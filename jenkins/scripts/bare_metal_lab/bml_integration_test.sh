@@ -14,6 +14,11 @@ set -xeu
 #  bml_integration_test.sh
 #
 
+# Debug
+echo  NUM_NODES: "${NUM_NODES}"
+echo  CONTROL_PLANE_MACHINE_COUNT: "${CONTROL_PLANE_MACHINE_COUNT}"
+echo  WORKER_MACHINE_COUNT: "${WORKER_MACHINE_COUNT}"
+
 CI_DIR="$(dirname "$(readlink -f "${0}")")"
 
 REPO_ORG="${REPO_ORG:-metal3-io}"
@@ -36,17 +41,32 @@ fi
 # In the bare metal lab, the external network has vlan id 3
 export EXTERNAL_VLAN_ID="${EXTERNAL_VLAN_ID:-"3"}"
 
-export BOOTSTRAP_CLUSTER="${BOOTSTRAP_CLUSTER:-"minikube"}"
-export CAPI_VERSION="${CAPI_VERSION:-v1beta2}"
-export CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
-export CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
-export BMORELEASEBRANCH="${BMORELEASEBRANCH:-main}"
-export IMAGE_OS="${IMAGE_OS:-centos}"
-export GITHUB_TOKEN="${GITHUB_TOKEN:-}"
-export FORCE_REPO_UPDATE=false
-export NUM_NODES="${NUM_NODES:-"2"}"
-export CONTROL_PLANE_MACHINE_COUNT="${CONTROL_PLANE_MACHINE_COUNT:-"1"}"
-export WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-"1"}"
+CAPI_VERSION="${CAPI_VERSION:-v1beta2}"
+CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
+CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
+BMORELEASEBRANCH="${BMORELEASEBRANCH:-main}"
+BARE_METAL_LAB=true
+IMAGE_OS="${IMAGE_OS:-ubuntu}"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+EPHEMERAL_CLUSTER="minikube"
+IMAGE_NAME="UBUNTU_24.04_NODE_IMAGE_K8S_v1.33.0.qcow2"
+
+cat <<-EOF >"/tmp/vars.sh"
+REPO_ORG="${REPO_ORG}"
+REPO_NAME="${REPO_NAME}"
+REPO_BRANCH="${REPO_BRANCH}"
+UPDATED_REPO="${UPDATED_REPO}"
+UPDATED_BRANCH="${UPDATED_BRANCH}"
+export CAPI_VERSION="${CAPI_VERSION}"
+export CAPM3_VERSION="${CAPM3_VERSION}"
+export CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH}"
+export BMORELEASEBRANCH="${BMORELEASEBRANCH}"
+export IMAGE_OS="${IMAGE_OS}"
+export BARE_METAL_LAB="${BARE_METAL_LAB}"
+export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER}"
+export IMAGE_NAME="${IMAGE_NAME}"
+export EXTERNAL_VLAN_ID="${EXTERNAL_VLAN_ID}"
+EOF
 
 
 # shellcheck disable=SC1091
@@ -58,21 +78,16 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook -v "${CI_DIR}"/deploy-lab.yaml
 # In the bare metal lab, we have already cloned metal3-dev-env and we run integration tests
 # so no need to clone other repos.
 if [[ "${REPO_NAME}" == "metal3-dev-env" ]]; then
-    export METAL3_DIR="${HOME}/tested_repo"
+    cd "${HOME}/tested_repo"
 else
-    export METAL3_DIR="${HOME}/metal3"
+    cd "${HOME}/metal3"
 fi
-
-cd "${METAL3_DIR}"
-
 echo "Running the tests"
 
 make provision
 make pivot
 
-# Run Pods Scaling test
-export ANSIBLE_CONFIG="${CI_DIR}"/tasks/pod_scaling/ansible.cfg
-ANSIBLE_FORCE_COLOR=true ansible-playbook -b "${CI_DIR}"/tasks/pod_scaling/pod-scaling.yaml -i "${CI_DIR}"/tasks/pod_scaling/inventory.ini
-
-make repivot
-make deprovision
+# shellcheck disable=SC1090,SC1091
+source lib/common.sh
+export ACTION="ci_test_provision"
+tests/run.sh
