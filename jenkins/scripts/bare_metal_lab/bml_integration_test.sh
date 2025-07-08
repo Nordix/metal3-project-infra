@@ -31,11 +31,23 @@ else
     export BML_METAL3_DEV_ENV_BRANCH="main"
 fi
 
+# See bare metal lab infrastructure documentation:
+# https://wiki.nordix.org/pages/viewpage.action?spaceKey=CPI&title=Bare+Metal+Lab
+# In the bare metal lab, the external network has vlan id 3
+EXTERNAL_VLAN_ID="3"
+
 CAPI_VERSION="${CAPI_VERSION:-v1beta1}"
 CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
 CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
 BMORELEASEBRANCH="${BMORELEASEBRANCH:-main}"
 BARE_METAL_LAB=true
+IMAGE_OS="${IMAGE_OS:-ubuntu}"
+NUM_NODES="${NUM_NODES:-2}"
+WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-1}"
+CONTROL_PLANE_MACHINE_COUNT="$((NUM_NODES-WORKER_MACHINE_COUNT))"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+FORCE_REPO_UPDATE=false
+EPHEMERAL_CLUSTER="minikube"
 
 cat <<-EOF >"/tmp/vars.sh"
 REPO_ORG="${REPO_ORG}"
@@ -48,8 +60,13 @@ CAPM3_VERSION="${CAPM3_VERSION}"
 CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH}"
 BMORELEASEBRANCH="${BMORELEASEBRANCH}"
 IMAGE_OS="${IMAGE_OS}"
-TARGET_NODE_MEMORY="${TARGET_NODE_MEMORY}"
 BARE_METAL_LAB="${BARE_METAL_LAB}"
+NUM_NODES="${NUM_NODES}"
+WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT}"
+CONTROL_PLANE_MACHINE_COUNT="${CONTROL_PLANE_MACHINE_COUNT}"
+EXTERNAL_VLAN_ID="${EXTERNAL_VLAN_ID}"
+FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE}"
+EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER}"
 EOF
 
 cat "${CI_DIR}/../dynamic_worker_workflow/test_env.sh" >>"/tmp/vars.sh"
@@ -58,8 +75,16 @@ echo "Setting up the lab"
 
 ANSIBLE_FORCE_COLOR=true ansible-playbook -v "${CI_DIR}"/deploy-lab.yaml
 
-echo "Running the tests"
-# Execute remote script
-# shellcheck disable=SC2029
+# In the bare metal lab, we have already cloned metal3-dev-env and we run integration tests
+# so no need to clone other repos.
+cd "${METAL3_DIR}/"
 
-"${CI_DIR}"/run_integration_tests.sh /tmp/vars.sh "${GITHUB_TOKEN}"
+echo "Running the tests"
+
+# shellcheck disable=SC1091
+. /tmp/vars.sh
+
+# shellcheck disable=SC1090,SC1091
+source "${METAL3_DIR}/lib/common.sh"
+export ACTION="ci_test_provision"
+"${METAL3_DIR}"/tests/run.sh
