@@ -7,8 +7,9 @@ set -xeu
 
 
 git clone https://github.com/Nordix/rook-ceph-ci.git
-git checkout ubuntu
 cd rook-ceph-ci/examples
+git checkout ubuntu
+
 ansible-playbook -i inventory.py deploy-rook.yaml
 echo "Rook and ceph successfully deployed"
 echo "Running rook ceph tests"
