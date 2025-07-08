@@ -36,14 +36,15 @@ pipeline {
     UPDATED_BRANCH = "${env.PULL_PULL_SHA}"
     BUILD_TAG = "${env.BUILD_TAG}"
     PR_ID = "${env.PULL_NUMBER}"
-    IMAGE_OS = "centos"
     CAPM3RELEASEBRANCH = "main"
     BMORELEASEBRANCH = "main"
-    TARGET_NODE_MEMORY = "4096"
-    NUM_NODES = 2
-    CAPI_VERSION = "v1beta1"
+    NUM_NODES = 4
+    WORKER_MACHINE_COUNT = 1
+    CONTROL_PLANE_MACHINE_COUNT = 3
+    CAPI_VERSION = "v1beta2"
     CAPM3_VERSION = "v1beta1"
     IMAGE_OS = "ubuntu"
+    EPHEMERAL_CLUSTER = "minikube"
   }
   stages {
     stage('SCM') {
