@@ -1,8 +1,5 @@
 ---
 - hosts: localhost
-  environment:
-    EPHEMERAL_CLUSTER: "{{ EPHEMERAL_CLUSTER }}"
-    EXTERNAL_VLAN_ID: "{{ EXTERNAL_VLAN_ID }}"
   vars_files:
     - default_vars/vars.yaml
   tasks:
