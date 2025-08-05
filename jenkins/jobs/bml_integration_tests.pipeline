@@ -36,8 +36,8 @@ pipeline {
     UPDATED_BRANCH = "${env.PULL_PULL_SHA}"
     BUILD_TAG = "${env.BUILD_TAG}"
     PR_ID = "${env.PULL_NUMBER}"
-    CAPM3RELEASEBRANCH = "main"
-    BMORELEASEBRANCH = "main"
+    CAPM3RELEASEBRANCH = "release-1.10"
+    BMORELEASEBRANCH = "release-0.10"
     NUM_NODES = 4
     WORKER_MACHINE_COUNT = 1
     CONTROL_PLANE_MACHINE_COUNT = 3
