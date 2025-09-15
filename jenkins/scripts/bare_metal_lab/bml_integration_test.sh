@@ -34,19 +34,40 @@ fi
 # See bare metal lab infrastructure documentation:
 # https://wiki.nordix.org/pages/viewpage.action?spaceKey=CPI&title=Bare+Metal+Lab
 # In the bare metal lab, the external network has vlan id 3
-export EXTERNAL_VLAN_ID="${EXTERNAL_VLAN_ID:-"3"}"
+EXTERNAL_VLAN_ID="3"
 
-export EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER:-"minikube"}"
-export CAPI_VERSION="${CAPI_VERSION:-v1beta2}"
-export CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
-export CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
-export BMORELEASEBRANCH="${BMORELEASEBRANCH:-main}"
-export IMAGE_OS="${IMAGE_OS:-centos}"
-export GITHUB_TOKEN="${GITHUB_TOKEN:-}"
-export FORCE_REPO_UPDATE=false
-export NUM_NODES="${NUM_NODES:-"2"}"
-export CONTROL_PLANE_MACHINE_COUNT="${CONTROL_PLANE_MACHINE_COUNT:-"1"}"
-export WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-"1"}"
+CAPI_VERSION="${CAPI_VERSION:-v1beta1}"
+CAPM3_VERSION="${CAPM3_VERSION:-v1beta1}"
+CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH:-main}"
+BMORELEASEBRANCH="${BMORELEASEBRANCH:-main}"
+BARE_METAL_LAB=true
+IMAGE_OS="${IMAGE_OS:-ubuntu}"
+NUM_NODES="${NUM_NODES:-2}"
+WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-1}"
+CONTROL_PLANE_MACHINE_COUNT="$((NUM_NODES-WORKER_MACHINE_COUNT))"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+FORCE_REPO_UPDATE=false
+EPHEMERAL_CLUSTER="minikube"
+
+cat <<-EOF >"/tmp/vars.sh"
+REPO_ORG="${REPO_ORG}"
+REPO_NAME="${REPO_NAME}"
+REPO_BRANCH="${REPO_BRANCH}"
+UPDATED_REPO="${UPDATED_REPO}"
+UPDATED_BRANCH="${UPDATED_BRANCH}"
+CAPI_VERSION="${CAPI_VERSION}"
+CAPM3_VERSION="${CAPM3_VERSION}"
+CAPM3RELEASEBRANCH="${CAPM3RELEASEBRANCH}"
+BMORELEASEBRANCH="${BMORELEASEBRANCH}"
+IMAGE_OS="${IMAGE_OS}"
+BARE_METAL_LAB="${BARE_METAL_LAB}"
+NUM_NODES="${NUM_NODES}"
+WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT}"
+CONTROL_PLANE_MACHINE_COUNT="${CONTROL_PLANE_MACHINE_COUNT}"
+EXTERNAL_VLAN_ID="${EXTERNAL_VLAN_ID}"
+FORCE_REPO_UPDATE="${FORCE_REPO_UPDATE}"
+EPHEMERAL_CLUSTER="${EPHEMERAL_CLUSTER}"
+EOF
 
 
 # shellcheck disable=SC1091
@@ -57,12 +78,14 @@ ANSIBLE_FORCE_COLOR=true ansible-playbook -v "${CI_DIR}"/deploy-lab.yaml
 
 # In the bare metal lab, we have already cloned metal3-dev-env and we run integration tests
 # so no need to clone other repos.
-if [[ "${REPO_NAME}" == "metal3-dev-env" ]]; then
-    cd "${HOME}/tested_repo"
-else
-    cd "${HOME}/metal3"
-fi
+cd "${METAL3_DIR}/"
 
 echo "Running the tests"
 
-make test
+# shellcheck disable=SC1091
+. /tmp/vars.sh
+
+# shellcheck disable=SC1090,SC1091
+source "${METAL3_DIR}/lib/common.sh"
+export ACTION="ci_test_provision"
+"${METAL3_DIR}"/tests/run.sh

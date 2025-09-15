@@ -7,7 +7,7 @@ script {
 
   UPDATED_REPO = "https://github.com/${env.REPO_OWNER}/${env.REPO_NAME}.git"
   echo "Test triggered from ${UPDATED_REPO}"
-  ci_git_url = "https://github.com/metal3-io/project-infra.git"
+  ci_git_url = "https://github.com/Nordix/project-infra.git"
 
   if ("${env.REPO_OWNER}" == 'metal3-io' && "${env.REPO_NAME}" == 'project-infra') {
     ci_git_branch = (env.PULL_PULL_SHA) ?: 'main'
@@ -15,7 +15,7 @@ script {
     // Fetch the base branch and the ci_git_branch when running on project-infra PR
     refspec = '+refs/heads/' + ci_git_base + ':refs/remotes/origin/' + ci_git_base + ' ' + ci_git_branch
   } else {
-    ci_git_branch = 'main'
+    ci_git_branch = 'rook-ceph-ci'
     refspec = '+refs/heads/*:refs/remotes/origin/*'
   }
     echo "Checkout ${ci_git_url} branch ${ci_git_branch}"
@@ -36,16 +36,13 @@ pipeline {
     UPDATED_BRANCH = "${env.PULL_PULL_SHA}"
     BUILD_TAG = "${env.BUILD_TAG}"
     PR_ID = "${env.PULL_NUMBER}"
-    IMAGE_OS = "${IMAGE_OS}"
-    CAPM3RELEASEBRANCH = "${capm3_release_branch}"
-    BMORELEASEBRANCH = "${bmo_release_branch}"
-    NUM_NODES = "${NUM_NODES}"
-    WORKER_MACHINE_COUNT = 1
-    CONTROL_PLANE_MACHINE_COUNT = 1
-    CAPI_VERSION = "${CAPI_VERSION}"
-    CAPM3_VERSION = "${CAPM3_VERSION}"
-    EPHEMERAL_CLUSTER = "minikube"
-    EXTERNAL_VLAN_ID = "3"
+    IMAGE_OS = "centos"
+    CAPM3RELEASEBRANCH = "main"
+    BMORELEASEBRANCH = "main"
+    TARGET_NODE_MEMORY = "4096"
+    NUM_NODES = 2
+    CAPI_VERSION = "v1beta1"
+    CAPM3_VERSION = "v1beta1"
   }
   stages {
     stage('SCM') {
@@ -73,7 +70,7 @@ pipeline {
         }
       }
     }
-    stage('Run integration test') {
+    stage('Provision BML and deploy cluster') {
       options {
         timeout(time: TIMEOUT, unit: 'SECONDS')
       }
@@ -83,6 +80,22 @@ pipeline {
             withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]){
               timestamps {
                 sh "./jenkins/scripts/bare_metal_lab/bml_integration_test.sh"
+              }
+            }
+          }
+        }
+      }
+    }
+    stage('Run Rook ceph tests') {
+      options {
+        timeout(time: TIMEOUT, unit: 'SECONDS')
+      }
+      steps {
+        withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY')]) {
+          withCredentials([usernamePassword(credentialsId: 'metal3-bml-ilo-credentials', usernameVariable: 'BML_ILO_USERNAME', passwordVariable: 'BML_ILO_PASSWORD')]) {
+            withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]){
+              timestamps {
+                sh "./jenkins/scripts/run_rook_test.sh"
               }
             }
           }
