@@ -87,7 +87,5 @@ echo "Running the tests"
 # shellcheck disable=SC1091
 . /tmp/vars.sh
 
-# shellcheck disable=SC1090,SC1091
-source lib/common.sh
-export ACTION="ci_test_provision"
-tests/run.sh
+make provision
+make pivot
