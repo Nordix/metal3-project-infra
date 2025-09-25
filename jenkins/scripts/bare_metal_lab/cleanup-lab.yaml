@@ -1,6 +1,5 @@
 ---
 - hosts: localhost
-  connection: local
   vars_files:
     - default_vars/vars.yaml
   tasks:

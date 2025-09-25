@@ -2,7 +2,7 @@ presubmits:
   metal3-io/ip-address-manager:
   - name: gomod
     branches:
-    - release-1.9
+    - release-1.11
     skip_if_only_changed: '(((^|/)OWNERS)|((^|/)OWNERS_ALIASES)|(\.md))$'
     decorate: true
     spec:
@@ -19,7 +19,7 @@ presubmits:
   # NOTE: The test jobs are for verifying the Makefile and hack/* scripts only
   - name: test
     branches:
-    - release-1.9
+    - release-1.11
     run_if_changed: "^(Makefile|hack/.*)$"
     decorate: true
     spec:
@@ -32,7 +32,7 @@ presubmits:
         imagePullPolicy: Always
   - name: markdownlint
     branches:
-    - release-1.9
+    - release-1.11
     run_if_changed: '(\.md|markdownlint\.sh)$'
     decorate: true
     spec:
@@ -48,7 +48,7 @@ presubmits:
         imagePullPolicy: Always
   - name: shellcheck
     branches:
-    - release-1.9
+    - release-1.11
     run_if_changed: '((\.sh)|^Makefile)$'
     decorate: true
     spec:
@@ -64,7 +64,7 @@ presubmits:
         imagePullPolicy: Always
   - name: unit
     branches:
-    - release-1.9
+    - release-1.11
     skip_if_only_changed: '(((^|/)OWNERS)|((^|/)OWNERS_ALIASES)|(\.md))$'
     decorate: true
     spec:
@@ -79,7 +79,7 @@ presubmits:
         image: docker.io/golang:1.24
   - name: generate
     branches:
-    - release-1.9
+    - release-1.11
     skip_if_only_changed: '(((^|/)OWNERS)|((^|/)OWNERS_ALIASES)|(\.md))$'
     decorate: true
     spec:
@@ -95,7 +95,7 @@ presubmits:
         imagePullPolicy: Always
   - name: manifestlint
     branches:
-    - release-1.9
+    - release-1.11
     skip_if_only_changed: '(((^|/)OWNERS)|((^|/)OWNERS_ALIASES)|(\.md))$'
     decorate: true
     spec:
@@ -109,78 +109,91 @@ presubmits:
           value: "TRUE"
         - name: KUBECONFORM_PATH
           value: "/"
-        image: ghcr.io/yannh/kubeconform:v0.6.2-alpine@sha256:49b5f6b320d30c1b8b72a7abdf02740ac9dc36a3ba23b934d1c02f7b37e6e740
+        image: ghcr.io/yannh/kubeconform:v0.6.7-alpine@sha256:824e0c248809e4b2da2a768b16b107cf17ada88a89ec6aa6050e566ba93ebbc6
         imagePullPolicy: Always
   # name: {job_prefix}-{image_os}-e2e-basic-test-{capm3_target_branch}
-  - name: metal3-centos-e2e-basic-test-release-1-9
+  - name: metal3-centos-e2e-basic-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-ubuntu-e2e-basic-test-release-1-9
+  - name: metal3-ubuntu-e2e-basic-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-centos-e2e-integration-test-release-1-9
+  - name: metal3-centos-e2e-integration-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: false
-  - name: metal3-ubuntu-e2e-integration-test-release-1-9
+  - name: metal3-ubuntu-e2e-integration-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-centos-e2e-feature-test-release-1-9-pivoting
+  - name: metal3-centos-e2e-feature-test-release-1-11-pivoting
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-centos-e2e-feature-test-release-1-9-remediation
+  - name: metal3-centos-e2e-feature-test-release-1-11-remediation
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-centos-e2e-feature-test-release-1-9-features
+  - name: metal3-centos-e2e-feature-test-release-1-11-features
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-ubuntu-e2e-feature-test-release-1-9-pivoting
+  - name: metal3-ubuntu-e2e-feature-test-release-1-11-pivoting
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-ubuntu-e2e-feature-test-release-1-9-remediation
+  - name: metal3-ubuntu-e2e-feature-test-release-1-11-remediation
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-ubuntu-e2e-feature-test-release-1-9-features
+  - name: metal3-ubuntu-e2e-feature-test-release-1-11-features
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-e2e-clusterctl-upgrade-test-release-1-9
+  - name: metal3-e2e-clusterctl-upgrade-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
-  - name: metal3-e2e-1-31-1-32-upgrade-test-release-1-9
+  - name: metal3-e2e-1-32-1-33-upgrade-test-release-1-11
     branches:
-    - release-1.9
+    - release-1.11
+    agent: jenkins
+    always_run: false
+    optional: true
+  # name: {job_prefix}-{image_os}-e2e-integration-k8s-pre-release-test-{capm3_target_branch}
+  - name: metal3-centos-e2e-integration-k8s-pre-release-test-release-1.11
+    branches:
+    - release-1.11
+    agent: jenkins
+    always_run: false
+    optional: true
+  - name: metal3-ubuntu-e2e-integration-k8s-pre-release-test-release-1.11
+    branches:
+    - release-1.11
     agent: jenkins
     always_run: false
     optional: true
