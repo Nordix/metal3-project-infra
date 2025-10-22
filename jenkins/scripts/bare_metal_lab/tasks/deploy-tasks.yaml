@@ -87,4 +87,4 @@
     query: "[? status.provisioning.state=='available']"
   until: (available_bmh is succeeded) and
         (available_bmh.resources | length > 0) and
-        (available_bmh.resources | json_query(query) | length == 2)
+        (available_bmh.resources | json_query(query) | length == 4)
