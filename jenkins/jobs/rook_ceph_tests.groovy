@@ -1,5 +1,5 @@
 // Global variables
-def TIMEOUT = 10800, ci_git_url, ci_git_branch, ci_git_base, refspec
+def TIMEOUT = 14400, ci_git_url, ci_git_branch, ci_git_base, refspec
 def UPDATED_REPO, CURRENT_START_TIME, CURRENT_END_TIME
 
 script {
@@ -34,17 +34,16 @@ pipeline {
         UPDATED_BRANCH = "${env.PULL_PULL_SHA}"
         BUILD_TAG = "${env.BUILD_TAG}"
         PR_ID = "${env.PULL_NUMBER}"
-        IMAGE_OS = "${IMAGE_OS}"
-        CAPM3RELEASEBRANCH = "${capm3_release_branch}"
-        BMORELEASEBRANCH = "${bmo_release_branch}"
-        NUM_NODES = "${NUM_NODES}"
+        IMAGE_OS = 'ubuntu'
+        CAPM3RELEASEBRANCH = 'release-1.11'
+        BMORELEASEBRANCH = 'release-0.11'
+        NUM_NODES = 4
         WORKER_MACHINE_COUNT = 1
-        CONTROL_PLANE_MACHINE_COUNT = 1
-        CAPI_VERSION = "${CAPI_VERSION}"
-        CAPM3_VERSION = "${CAPM3_VERSION}"
+        CONTROL_PLANE_MACHINE_COUNT = 3
+        CAPI_VERSION = 'v1beta2'
+        CAPM3_VERSION = 'v1beta1'
         BOOTSTRAP_CLUSTER = 'minikube'
         EXTERNAL_VLAN_ID = '3'
-        IMAGE_OS = 'ubuntu'
     }
     stages {
         stage('SCM') {
@@ -84,7 +83,22 @@ pipeline {
                     timestamps {
                         sh './jenkins/scripts/bare_metal_lab/bml_integration_test.sh'
                     }
-                }
+                    }
+            }
+        }
+        stage('Run Rook Ceph test') {
+            options {
+                timeout(time: TIMEOUT, unit: 'SECONDS')
+            }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY'),
+                    usernamePassword(credentialsId: 'metal3-bml-ilo-credentials', usernameVariable: 'BML_ILO_USERNAME', passwordVariable: 'BML_ILO_PASSWORD'),
+                    string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                    timestamps {
+                        sh './jenkins/scripts/run_rook_test.sh'
+                    }
+                    }
             }
         }
     }
@@ -103,16 +117,16 @@ pipeline {
                     sh './jenkins/scripts/dynamic_worker_workflow/fetch_logs.sh'
                     archiveArtifacts "logs-${env.BUILD_TAG}.tgz"
                 }
-            }
+                }
         }
-        success {
+        always {
             withCredentials([sshUserPrivateKey(credentialsId: 'metal3ci_city_cloud_ssh_keypair', keyFileVariable: 'METAL3_CI_USER_KEY'),
                 usernamePassword(credentialsId: 'metal3-bml-ilo-credentials', usernameVariable: 'BML_ILO_USERNAME', passwordVariable: 'BML_ILO_PASSWORD'),
                 string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
                 timestamps {
                     sh './jenkins/scripts/bare_metal_lab/bml_cleanup.sh'
                 }
-            }
+                }
         }
     }
 }

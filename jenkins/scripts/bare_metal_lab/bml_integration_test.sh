@@ -86,6 +86,3 @@ echo "Running the tests"
 
 make provision
 make pivot
-
-make provision
-make pivot
