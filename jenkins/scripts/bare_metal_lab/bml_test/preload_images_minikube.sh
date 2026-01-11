@@ -16,7 +16,7 @@ IMAGES=(
     "quay.io/jetstack/cert-manager-controller:v1.19.1"
     "quay.io/jetstack/cert-manager-cainjector:v1.19.1"
     "quay.io/jetstack/cert-manager-webhook:v1.19.1"
-    "registry.nordix.org/quay-io-proxy/metal3-io/ironic-standalone-operator:latest"
+    "registry.nordix.org/quay-io-proxy/metal3-io/ironic-standalone-operator:main"
     "registry.nordix.org/quay-io-proxy/metal3-io/ip-address-manager:main"
 )
 

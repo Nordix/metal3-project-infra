@@ -43,3 +43,14 @@ export IRONIC_KEY_FILE="${WORKING_DIR}certs/ironic.key"
 
 export IRSO_TAG="main"
 export IRSOPATH="/home/${USER}/go/src/github.com/metal3-io/ironic-standalone-operator"
+export IRONIC_ROLLOUT_WAIT=5
+
+export BMH_NAME_1="bmh-03"
+export IP_ADDRESS_1="192.168.1.24"
+export MAC_ADDRESS_1="b4:b5:2f:6d:89:d8"
+export ROOTDEVICEHINT_1="/dev/disk/by-path/pci-0000:03:00.0-scsi-0:1:0:1"
+
+export BMH_NAME_2="bmh-05"
+export IP_ADDRESS_2="192.168.1.14"
+export MAC_ADDRESS_2="80:c1:6e:7a:5a:a8"
+export ROOTDEVICEHINT_2="/dev/disk/by-path/pci-0000:03:00.0-scsi-0:1:0:0"

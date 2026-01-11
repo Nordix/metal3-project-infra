@@ -155,9 +155,6 @@ launch_ironic_via_irso()
         --from-file=username="${IRONIC_AUTH_DIR}ironic-username"  \
         --from-file=password="${IRONIC_AUTH_DIR}ironic-password"
 
-    kubectl create secret tls ironic-cert -n "${IRONIC_NAMESPACE}" --key="${IRONIC_KEY_FILE}" --cert="${IRONIC_CERT_FILE}"
-    kubectl create secret tls ironic-cacert -n "${IRONIC_NAMESPACE}" --key="${IRONIC_CAKEY_FILE}" --cert="${IRONIC_CACERT_FILE}"
-
     local ironic="${IRONIC_DATA_DIR}/ironic.yaml"
     cat > "${ironic}" <<EOF
 ---
@@ -194,7 +191,6 @@ EOF
     done
 
     if ! kubectl wait --for=condition=Ready --timeout="${IRONIC_ROLLOUT_WAIT}m" -n "${IRONIC_NAMESPACE}" ironic/ironic; then
-        # FIXME(dtantsur): remove this when Ironic objects are collected in the CI
         kubectl get -n "${IRONIC_NAMESPACE}" -o yaml ironic/ironic
         exit 1
     fi
@@ -244,6 +240,9 @@ start_management_cluster
 # Preload images into minikube
 ./preload_images_minikube.sh
 kubectl create namespace metal3
+
+kubectl create secret tls ironic-cert -n "${IRONIC_NAMESPACE}" --key="${IRONIC_KEY_FILE}" --cert="${IRONIC_CERT_FILE}"
+kubectl create secret tls ironic-cacert -n "${IRONIC_NAMESPACE}" --key="${IRONIC_CAKEY_FILE}" --cert="${IRONIC_CACERT_FILE}"
 
 patch_clusterctl
 patch_ipam
