@@ -108,6 +108,7 @@ if [[ "${IMAGE_TYPE}" == "node" ]]; then
   # enable predictable interface names
   export DIB_BOOTLOADER_DEFAULT_CMDLINE="net.ifnames=1"
 else
+  export DIB_CLOUD_INIT_DATASOURCES="Oracle,OpenStack,ConfigDrive"
   commit_short="$(git rev-parse --short HEAD)"
   img_date="$(date --utc +"%Y%m%dT%H%MZ")"
   img_name="metal3${IMAGE_TYPE}-${IMAGE_OS}-${img_date}-${commit_short}"
