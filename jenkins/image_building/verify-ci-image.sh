@@ -13,11 +13,11 @@ verify_ci_image() {
     export CLEANUP_AFTERWARDS="${CLEANUP_AFTERWARDS:-false}"
 
     # Similar config to periodic integration tests
-    export REPO_BRANCH="main"
-    export REPO_ORG="metal3-io"
+    export REPO_BRANCH="fixes/minikube-path"
+    export REPO_ORG="Nordix"
     export REPO_NAME="metal3-dev-env"
-    export UPDATED_REPO="metal3-io/metal3-dev-env"
-    export UPDATED_BRANCH="main"
+    export UPDATED_REPO="Nordix/metal3-dev-env"
+    export UPDATED_BRANCH="fixes/minikube-path"
     export NUM_NODES=2
 
     export IRONIC_INSTALL_TYPE="rpm"
