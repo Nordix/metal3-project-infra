@@ -133,12 +133,16 @@ presubmits:
     branches:
     - release-1.12
     agent: jenkins
+    labels:
+      jenkins-job-orchestrator: jenkins.apps.test.metal3.io
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-basic-test-release-1-12
     branches:
     - release-1.12
     agent: jenkins
+    labels:
+      jenkins-job-orchestrator: jenkins.apps.test.metal3.io
     always_run: false
     optional: true
   # name: {job_prefix}-{image_os}-e2e-integration-test-{capm3_target_branch}
