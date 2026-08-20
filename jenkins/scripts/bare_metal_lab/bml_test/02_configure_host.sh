@@ -57,6 +57,8 @@ init_minikube()
             if ip link show virbr0 > /dev/null 2>&1; then
                 sudo ip link delete virbr0
             fi
+
+            ensure_default_network
         done
         sudo su -l -c "minikube stop" "${USER}"
     fi
@@ -78,6 +80,30 @@ init_minikube()
             --model virtio --source external \
             --type network --config
     fi
+}
+
+ensure_default_network()
+{
+    if ! sudo virsh net-info default > /dev/null 2>&1; then
+        sudo virsh net-define /dev/stdin <<'EOF'
+<network>
+  <name>default</name>
+  <forward mode='nat'/>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.122.2' end='192.168.122.254'/>
+    </dhcp>
+  </ip>
+</network>
+EOF
+    fi
+
+    if [[ "$(sudo virsh net-info default | awk '/^Active:/ {print $2}')" != "yes" ]]; then
+        sudo virsh net-start default
+    fi
+
+    sudo virsh net-autostart default
 }
 
 # Crete libvirt networks
@@ -107,7 +133,7 @@ sudo ip link set ironicendpoint up
 sudo ip link set ironic-peer up
 
 # Add physical interfaces to the bridges
-sudo brctl addif provisioning eno1
+sudo brctl addif provisioning eno49
 sudo brctl addif external bmext
 
 # Create the external bridge
@@ -118,6 +144,8 @@ if ! ip a show external &>/dev/null; then
         sudo ip addr add dev external "${EXTERNAL_SUBNET_V4_HOST}/${EXTERNAL_SUBNET_V4_PREFIX}"
     sudo ip link set external up
 fi
+
+ensure_default_network
 
 minikube config set driver kvm2
 minikube config set memory 4096

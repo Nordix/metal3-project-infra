@@ -7,17 +7,19 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 set -x
 
-sudo ip link delete external
-sudo ip link delete ironic-peer
-sudo ip link delete ironicendpoint
-sudo ip link delete provisioning
+sudo virsh net-destroy provisioning || true
+sudo virsh net-destroy external || true
 
-# Destroy and undefine the libvirt networks
-sudo virsh net-destroy provisioning
-sudo virsh net-destroy external
+sudo pkill -9 -f '/var/lib/libvirt/dnsmasq/external.conf' || true
+sudo pkill -9 -f '/var/lib/libvirt/dnsmasq/provisioning.conf' || true
 
-sudo virsh net-undefine provisioning
-sudo virsh net-undefine external
+sudo ip link delete external || true
+sudo ip link delete ironic-peer || true
+sudo ip link delete ironicendpoint || true
+sudo ip link delete provisioning || true
+
+sudo virsh net-undefine provisioning || true
+sudo virsh net-undefine external || true
 
 minikube delete
 
