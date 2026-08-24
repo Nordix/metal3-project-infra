@@ -4,47 +4,66 @@ set -eu
 
 # Description:
 # Runs in main integration cleanup job defined in jjb.
-# Consumed by clean_resources.pipeline and cleans any leftover metal3ci vms
-# every 6 hours.
+# Consumed by clean_resources.pipeline and cleans any leftover metal3ci
+# instances every 8 hours.
 # Requires:
-#  - source openstack.rc file
+#  - OCI CLI credentials sourced from the environment
+#    (OCI_CLI_USER, OCI_CLI_TENANCY, OCI_CLI_FINGERPRINT, OCI_CLI_REGION)
+#  - OCI_KEY_FILE pointing to the API private key
 # Usage:
 #  clean_resources.sh
 #
-CLIENT_VERSION="7.0.0"
-JENKINS_INSTANCE="https://jenkins.nordix.org/"
+CLIENT_VERSION="3.76.0"
+COMPARTMENT_OCID="ocid1.tenancy.oc1..aaaaaaaalbjclmsqx5zyjbqgtywhfxns4qavoppuhp6peixiqmm6vu3qyn7a"
+OCI_KEY_TMP="/tmp/oci_key.pem"
+export OCI_CLI_REGION="eu-paris-1"
 
 cleanup() {
     # Get the current date and time in seconds since the epoch
     current_time=$(date +%s)
 
-    # Define the age threshold (6 hours in seconds)
-    age_threshold=$((6 * 60 * 60))
+    # Define the age threshold (8 hours in seconds)
+    age_threshold=$((8 * 60 * 60))
 
-    # List all servers and loop over their IDs and Names
-    openstack server list -f value -c ID -c Name | while read -r server_id server_name; do
-        # Check if the server name starts with "metal3ci-"
-        if [[ "${server_name}" == metal3ci-* ]]; then
-            # Get the creation date of the server
-            created_at=$(openstack server show "${server_id}" -f value -c created)
-            jenkins_ins="$(openstack server show "${server_id}" -f json -c properties | jq -r '.properties."jenkins-instance"')"
-            # Convert server creation date to seconds since the epoch
-            server_time=$(date --date="${created_at}" +%s)
+    # List all running instances and loop over them
+    oci compute instance list \
+        --compartment-id "${COMPARTMENT_OCID}" \
+        --lifecycle-state RUNNING \
+        --all \
+        --query 'data[].{id:id, name:"display-name", created:"time-created"}' \
+        --output json | jq -c '.[]?' | while read -r instance; do
+        instance_id=$(jq -r '.id' <<< "${instance}")
+        instance_name=$(jq -r '.name' <<< "${instance}")
+        created_at=$(jq -r '.created' <<< "${instance}")
 
-            # Calculate the age of the server
-            server_age=$((current_time - server_time))
+        # Check if the instance name starts with "jenkins-metal3ci-8c32g-"
+        if [[ "${instance_name}" == jenkins-metal3ci-8c32g-* ]]; then
+            # Convert instance creation date to seconds since the epoch
+            instance_time=$(date --date="${created_at}" +%s)
 
-            # Check if the server is older than 6 hours
-            if [[ "${server_age}" -gt "${age_threshold}" ]]  && \
-               [[ "${JENKINS_INSTANCE}" == "${jenkins_ins}" ]]; then
-                echo -n "Deleting server: ${server_id} (Name: ${server_name}, "
+            # Calculate the age of the instance
+            instance_age=$((current_time - instance_time))
+
+            # Check if the instance is older than 6 hours
+            if [[ "${instance_age}" -gt "${age_threshold}" ]]; then
+                echo -n "Deleting instance: ${instance_id} (Name: ${instance_name}, "
                 echo "Created at: ${created_at})"
-                # Delete the server
-                openstack server delete "${server_id}"
+                # Terminate the instance
+                oci compute instance terminate --instance-id "${instance_id}" --force
             fi
         fi
     done
 }
+
+# Prepare the API private key for the OCI CLI
+cp "${OCI_KEY_FILE}" "${OCI_KEY_TMP}"
+chmod 600 "${OCI_KEY_TMP}"
+export OCI_CLI_KEY_FILE="${OCI_KEY_TMP}"
+
+remove_key() {
+    rm -f "${OCI_KEY_TMP}"
+}
+trap remove_key EXIT
 
 WORK_VENV="${HOME}/civenv"
 WORK_VENV_ACTIVATOR="${WORK_VENV}/bin/activate"
@@ -57,17 +76,14 @@ fi
 
 # shellcheck source=/dev/null
 . "${WORK_VENV_ACTIVATOR}"
-# Install openstack client
-pip install python-openstackclient=="${CLIENT_VERSION}"
-# export openstackclient path
+# Install OCI client
+pip install oci-cli=="${CLIENT_VERSION}"
+# export ocicli path
 export PATH="${PATH}:${HOME}/.local/bin"
 
-export OS_USERNAME="${OPENSTACK_USERNAME_XERCES}"
-export OS_PASSWORD="${OPENSTACK_PASSWORD_XERCES}"
-
-# Cleaning up Private cloud resources
-echo "Cleaning up Private Cloud"
+# Cleaning up Oracle Cloud resources
+echo "Cleaning up Oracle Cloud"
 cleanup
 
-# deactiveate the python venv (for non ci use)
+# deactivate the python venv (for non ci use)
 deactivate
