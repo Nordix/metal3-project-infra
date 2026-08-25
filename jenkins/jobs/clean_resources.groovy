@@ -15,16 +15,6 @@ currentBuild.description = """<a href='${GRAFANA_VIEW}'>View in log collector</a
 
 pipeline {
     agent { label 'metal3ci-4c16gb-ubuntu-jnlp' }
-    environment {
-        OS_USERNAME = 'metal3ci'
-        OS_AUTH_URL = 'https://xerces.ericsson.net:5000'
-        OS_PROJECT_ID = 'b62dc8622f87407589de9f7dcec13d25'
-        OS_INTERFACE = 'public'
-        OS_PROJECT_NAME = 'EST_Metal3_CI'
-        OS_USER_DOMAIN_NAME = 'xerces'
-        OS_AUTH_VERSION = 3
-        OS_IDENTITY_API_VERSION = 3
-    }
     stages {
         stage('SCM') {
             options {
@@ -49,10 +39,16 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                usernamePassword(credentialsId: 'xerces-est-metal3ci', usernameVariable: 'OPENSTACK_USERNAME_XERCES', passwordVariable: 'OPENSTACK_PASSWORD_XERCES'),
+                file(credentialsId: 'metal3-oracle-cloud-api-private-key', variable: 'OCI_KEY_FILE'),
+                file(credentialsId: 'metal3-oracle-paris-env-vars', variable: 'OCI_CLI_ENV_FILE'),
                 ])  {
                         timestamps {
-                            sh './jenkins/scripts/clean_resources.sh'
+                            sh '''
+                            set -a +x
+                            . "$OCI_CLI_ENV_FILE"
+                            set +a -x
+                            ./jenkins/scripts/clean_resources.sh
+                            '''
                         }
                     }
                 }
