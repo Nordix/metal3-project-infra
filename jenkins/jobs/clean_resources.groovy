@@ -14,7 +14,7 @@ GRAFANA_VIEW = """${LOG_URL}&from=${START_TIME}&to=now&var-pipeline=${env.JOB_NA
 currentBuild.description = """<a href='${GRAFANA_VIEW}'>View in log collector</a>"""
 
 pipeline {
-    agent { label 'metal3ci-4c16gb-ubuntu-jnlp' }
+    agent { label 'metal3ci-8c32gb-ubuntu-oci' }
     stages {
         stage('SCM') {
             options {
