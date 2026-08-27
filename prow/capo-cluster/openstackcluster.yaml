@@ -38,8 +38,9 @@ spec:
   managedSubnets:
   - cidr: 10.6.0.0/24
     dnsNameservers:
+    - 129.192.80.4
+    - 129.192.80.5
     - 8.8.8.8
-    - 1.1.1.1
   bastion:
     enabled: true
     spec:

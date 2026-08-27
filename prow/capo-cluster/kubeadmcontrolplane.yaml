@@ -5,6 +5,8 @@ metadata:
 spec:
   kubeadmConfigSpec:
     clusterConfiguration:
+      dns:
+        imageTag: v1.14.6
       controllerManager:
         extraArgs:
           cloud-provider: external
