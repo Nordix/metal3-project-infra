@@ -98,6 +98,8 @@ presubmits:
     optional: true
   - name: metal3-centos-e2e-basic-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-basic-test-release-1-10
@@ -112,6 +114,8 @@ presubmits:
     optional: true
   - name: metal3-ubuntu-e2e-basic-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-basic-test-release-1-10
@@ -127,6 +131,8 @@ presubmits:
     optional: true
   - name: metal3-centos-e2e-integration-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-integration-test-release-1-10
@@ -141,6 +147,8 @@ presubmits:
     optional: false
   - name: metal3-ubuntu-e2e-integration-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-release-1-10
@@ -156,6 +164,8 @@ presubmits:
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-11-pivoting
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-10-pivoting
@@ -170,6 +180,8 @@ presubmits:
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-11-remediation
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-10-remediation
@@ -184,6 +196,8 @@ presubmits:
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-11-features
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-feature-test-release-1-10-features
@@ -198,6 +212,8 @@ presubmits:
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-11-pivoting
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-10-pivoting
@@ -212,6 +228,8 @@ presubmits:
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-11-remediation
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-10-remediation
@@ -226,6 +244,8 @@ presubmits:
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-11-features
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-feature-test-release-1-10-features
@@ -241,6 +261,8 @@ presubmits:
     optional: true
   - name: metal3-e2e-clusterctl-upgrade-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-e2e-clusterctl-upgrade-test-release-1-10
@@ -256,6 +278,8 @@ presubmits:
     optional: true
   - name: metal3-e2e-1-33-1-34-upgrade-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-dev-env-integration-test-centos-main
@@ -266,6 +290,8 @@ presubmits:
     optional: true
   - name: metal3-dev-env-integration-test-centos-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-dev-env-integration-test-centos-release-1-10
@@ -280,6 +306,8 @@ presubmits:
     optional: true
   - name: metal3-dev-env-integration-test-ubuntu-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-dev-env-integration-test-ubuntu-release-1-10

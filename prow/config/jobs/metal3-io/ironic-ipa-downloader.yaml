@@ -37,18 +37,26 @@ presubmits:
     optional: false
   - name: metal3-centos-e2e-integration-test-release-1-14
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-integration-test-release-1-13
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-integration-test-release-1-12
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-centos-e2e-integration-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-main
@@ -59,17 +67,25 @@ presubmits:
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-release-1-14
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-release-1-13
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-release-1-12
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
   - name: metal3-ubuntu-e2e-integration-test-release-1-11
     agent: jenkins
+    labels:
+      jenkins_operator: oci
     always_run: false
     optional: true
