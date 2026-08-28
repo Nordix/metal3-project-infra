@@ -92,7 +92,7 @@ There are multiple folders with kustomizations:
 The deployment manifests for Prow (`manifests`) are based on the
 [getting started guide](https://docs.prow.k8s.io/docs/getting-started-deploy/)
 and the
-[starter-s3.yaml](https://github.com/kubernetes/test-infra/blob/master/config/prow/cluster/starter/starter-s3.yaml)
+[starter-s3.yaml](https://github.com/kubernetes-sigs/prow/blob/main/config/prow/cluster/starter/starter-s3.yaml)
 manifests. They have been separated out into multiple files and tied together
 using kustomizations. This makes it easy to keep secrets outside of git while
 still allowing for simple one-liners for applying all of it.
