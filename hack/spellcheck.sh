@@ -27,6 +27,6 @@ else
         --volume "${PWD}:${WORKDIR}:ro,z" \
         --entrypoint sh \
         --workdir "${WORKDIR}" \
-        ghcr.io/streetsidesoftware/cspell:10.0.1@sha256:ec3c20bf274834311cbe72705689e5a21ae8dc6a29ceee5b2248c424b4783ce3 \
+        ghcr.io/streetsidesoftware/cspell:10.1.1@sha256:14f0c074898869c3f8060787d4c7eb86e43f8de9e3aaca0c4323741f9bd6cbff \
         "${WORKDIR}"/hack/spellcheck.sh "$@"
 fi
