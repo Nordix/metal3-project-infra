@@ -240,7 +240,7 @@ pipeline {
                     .findAll { branch -> branch }
 
                     IRSO_BRANCHES = sh(
-                      script: "jenkins/scripts/get_last_n_release_branches.sh ${IRSO_GIT_URL} 3",
+                      script: "jenkins/scripts/get_last_n_release_branches.sh ${IRSO_GIT_URL} 2",
                       returnStdout: true
                     ).trim()
                     .split('\\n')
