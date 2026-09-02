@@ -16,6 +16,7 @@ plugins:
     - heart
     - help
     - hold
+    - issue-management
     - label
     - lgtm
     - lifecycle
@@ -23,7 +24,6 @@ plugins:
     - retitle
     - shrug
     - size
-    - transfer-issue
     - trigger
     - verify-owners
     - wip
@@ -43,6 +43,7 @@ plugins:
     - heart
     - help
     - hold
+    - issue-management
     - label
     - lgtm
     - lifecycle
@@ -51,7 +52,6 @@ plugins:
     - retitle
     - shrug
     - size
-    - transfer-issue
     - trigger
     - verify-owners
     - wip
