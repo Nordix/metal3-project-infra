@@ -29,7 +29,7 @@ export IPAMPATH="/home/metal3ci/go/src/github.com/metal3-io/ip-address-manager"
 export CAPI_CONFIG_DIR="/home/metal3ci/.config/cluster-api"
 
 export IRONIC_NAMESPACE="baremetal-operator-system"
-export IRSO_IRONIC_VERSION="33.0"
+export IRSO_IRONIC_VERSION="38.0"
 
 export WORKING_DIR="/opt/metal3-dev-env/"
 export IRONIC_BASE_URL="http://172.22.0.2"

@@ -7,7 +7,7 @@ MAX_BACKOFF="${MAX_BACKOFF:-120}"
 
 IMAGES=(
     "registry.nordix.org/quay-io-proxy/metal3-io/baremetal-operator:main"
-    "registry.nordix.org/quay-io-proxy/metal3-io/ironic:release-33.0"
+    "registry.nordix.org/quay-io-proxy/metal3-io/ironic:release-38.0"
     "registry.nordix.org/quay-io-proxy/metal3-io/keepalived:release-0.9"
     "registry.k8s.io/cluster-api/kubeadm-bootstrap-controller:v1.13.3"
     "registry.k8s.io/cluster-api/kubeadm-control-plane-controller:v1.13.3"
