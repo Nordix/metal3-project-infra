@@ -120,13 +120,15 @@ pipeline {
                         }
                         steps {
                             echo "Testing new ${IMAGE_OS} node image"
-                            script {
-                                def imageName = readFile('image_name.txt').trim()
+                            withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                                script {
+                                    def imageName = readFile('image_name.txt').trim()
 
-                                sh """
-                                echo "Testing ${imageName}"
-                                ./jenkins/image_building/verify-node-image.sh ${imageName}
-                                """
+                                    sh """
+                                    echo "Testing ${imageName}"
+                                    ./jenkins/image_building/verify-node-image.sh ${imageName}
+                                    """
+                                }
                             }
                         }
                     }
@@ -143,8 +145,10 @@ pipeline {
                         }
                         steps {
                             echo "Testing new ${IMAGE_OS} CI image"
-                            script {
-                                sh './jenkins/image_building/verify-ci-image.sh'
+                            withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                                script {
+                                    sh './jenkins/image_building/verify-ci-image.sh'
+                                }
                             }
                         }
                     }
