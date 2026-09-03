@@ -71,7 +71,7 @@ pipeline {
                         [$class: 'CleanBeforeCheckout']
                         ],
                     submoduleCfg: [],
-                    userRemoteConfigs: [[url: ci_git_url, refspec: refspec]]
+                    userRemoteConfigs: [[url: ci_git_url, refspec: refspec, credentialsId: 'metal3-clusterctl-github-token']]
                 ])
                 /* Pass all the credentials */
                 withCredentials([usernamePassword(credentialsId: 'infra-nordix-artifactory-api-key', usernameVariable: 'RT_USER', passwordVariable: 'RT_TOKEN'),

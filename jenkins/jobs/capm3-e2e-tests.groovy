@@ -103,7 +103,7 @@ pipeline {
                       [$class: 'CleanBeforeCheckout']
                       ],
                   submoduleCfg: [],
-                  userRemoteConfigs: [[url: ci_git_url, refspec: refspec]]
+                  userRemoteConfigs: [[url: ci_git_url, refspec: refspec, credentialsId: 'metal3-clusterctl-github-token']]
                   ])
                 withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN'),
                     usernamePassword(credentialsId: 'metal3-ci-log-collector-push', usernameVariable: 'LOKI_USERNAME', passwordVariable: 'LOKI_PASSWORD')]) {
