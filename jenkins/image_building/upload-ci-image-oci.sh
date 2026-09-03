@@ -127,6 +127,18 @@ import_candidate_image_from_bucket() {
   wait_for_image_available "${image_id}"
 }
 
+# Rename an image's display name by id.
+rename_image() {
+  local image_id="$1"
+  local new_name="$2"
+
+  oci compute image update \
+    --image-id "${image_id}" \
+    --display-name "${new_name}" \
+    --force
+}
+
+# Promote the candidate image "latest" display name.
 promote_candidate_to_latest() {
   local candidate_image_id
   candidate_image_id="$(get_image_id_by_name "${CANDIDATE_IMAGE_NAME}")"
@@ -137,44 +149,57 @@ promote_candidate_to_latest() {
   fi
 
   wait_for_image_available "${candidate_image_id}"
-  delete_image_from_compute_by_name "${COMMON_IMAGE_NAME}" || true
 
-  oci compute image update \
-    --image-id "${candidate_image_id}" \
-    --display-name "${COMMON_IMAGE_NAME}" \
-    --force
+  # Capture the current "latest" image (if any) so we can preserve it.
+  local old_latest_id
+  old_latest_id="$(get_image_id_by_name "${COMMON_IMAGE_NAME}")"
+
+  local backup_name=""
+  if [[ -n "${old_latest_id}" && "${old_latest_id}" != "null" ]]; then
+    backup_name="${COMMON_IMAGE_NAME}-backup-$(date -u +%Y%m%d%H%M%S)"
+    echo "==> [promote-candidate] preserving current '${COMMON_IMAGE_NAME}' as '${backup_name}'"
+    # Free up the "latest" display name without destroying the image.
+    rename_image "${old_latest_id}" "${backup_name}"
+  else
+    echo "==> [promote-candidate] no existing '${COMMON_IMAGE_NAME}' image found"
+  fi
+
+  # Promote the candidate to "latest". On failure, roll the old image back so
+  # dependent jobs always have a working "latest".
+  echo "==> [promote-candidate] promoting candidate to '${COMMON_IMAGE_NAME}'"
+  if ! rename_image "${candidate_image_id}" "${COMMON_IMAGE_NAME}"; then
+    echo "ERROR: failed to promote candidate to '${COMMON_IMAGE_NAME}'" >&2
+    if [[ -n "${backup_name}" && -n "${old_latest_id}" && "${old_latest_id}" != "null" ]]; then
+      echo "==> [promote-candidate] rolling back '${backup_name}' to '${COMMON_IMAGE_NAME}'" >&2
+      rename_image "${old_latest_id}" "${COMMON_IMAGE_NAME}"
+    fi
+    exit 1
+  fi
+
+  # Promotion succeeded; now it is safe to delete the preserved old image.
+  if [[ -n "${old_latest_id}" && "${old_latest_id}" != "null" ]]; then
+    echo "==> [promote-candidate] deleting preserved old image '${backup_name}'"
+    if ! oci compute image delete --image-id "${old_latest_id}" --force; then
+      echo "WARNING: failed to delete old image '${backup_name}' (${old_latest_id})" >&2
+    fi
+  fi
+
+  echo "==> [promote-candidate] DONE"
 }
 
-delete_old_objects() {
+# Delete a bucket object by name.
+delete_bucket_object() {
+  local object_name="$1"
 
-  local objects
-  mapfile -t objects < <(
-    oci os object list \
+  if oci os object delete \
       --namespace-name "${NAMESPACE_OCID}" \
       --bucket-name "${BUCKET_NAME}" \
-      --prefix "metal3ci-${IMAGE_OS}" \
-      --all \
-      --query 'data[].name' \
-      --raw-output \
-    | tr -d '[],"' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' \
-    | grep -v '^$' \
-    | sort -r
-  )
-
-  local retention_num=5
-
-  for ((i="${retention_num}"; i<${#objects[@]}; i++)); do
-    if oci os object delete \
-        --namespace-name "${NAMESPACE_OCID}" \
-        --bucket-name "${BUCKET_NAME}" \
-        --name "${objects[i]}" \
-        --force; then
-      echo "Deleted old object: ${objects[i]}"
-    else
-      echo "WARNING: failed to delete object: ${objects[i]}" >&2
-    fi
-  done
+      --name "${object_name}" \
+      --force; then
+    echo "Deleted bucket object: ${object_name}"
+  else
+    echo "WARNING: failed to delete bucket object: ${object_name}" >&2
+  fi
 }
 
 install_oci_client
@@ -191,8 +216,8 @@ case "${action}" in
     delete_image_from_compute_by_name "${CANDIDATE_IMAGE_NAME}" || true
     echo "==> [upload-candidate] importing candidate image '${CANDIDATE_IMAGE_NAME}'"
     import_candidate_image_from_bucket
-    echo "==> [upload-candidate] pruning old bucket objects"
-    delete_old_objects || true
+    echo "==> [upload-candidate] removing intermediate bucket object '${img_name}.qcow2'"
+    delete_bucket_object "${img_name}".qcow2 || true
     echo "==> [upload-candidate] DONE"
     ;;
   promote-candidate)
