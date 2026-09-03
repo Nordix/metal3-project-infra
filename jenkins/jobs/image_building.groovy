@@ -70,7 +70,7 @@ pipeline {
                   [$class: 'CleanBeforeCheckout']
                 ],
                 submoduleCfg: [],
-                userRemoteConfigs: [[url: ci_git_url, refspec: refspec]]
+                userRemoteConfigs: [[url: ci_git_url, refspec: refspec, credentialsId: 'metal3-clusterctl-github-token']]
               ])
                         }
                     }

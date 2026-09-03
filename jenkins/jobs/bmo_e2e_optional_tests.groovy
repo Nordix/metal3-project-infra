@@ -39,7 +39,7 @@ pipeline {
                             deleteDir()
                             checkout scmGit(
                   branches: [[name: pullSha]],
-                  userRemoteConfigs: [[url: repoUrl, refspec: refspec]],
+                  userRemoteConfigs: [[url: repoUrl, refspec: refspec, credentialsId: 'metal3-clusterctl-github-token']],
                   extensions: [[$class: 'CleanCheckout'],
                   [$class: 'CleanBeforeCheckout'],
                   [$class: 'PreBuildMerge', options: [mergeTarget: pullBase, mergeRemote: 'origin']],
