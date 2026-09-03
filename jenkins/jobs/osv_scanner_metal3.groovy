@@ -215,49 +215,51 @@ pipeline {
         }
         stage('Resolve Branches') {
             steps {
-                script {
-                    sh 'chmod +x jenkins/scripts/get_last_n_release_branches.sh || true'
+                withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                    script {
+                        sh 'chmod +x jenkins/scripts/get_last_n_release_branches.sh || true'
 
-                    CAPM3_BRANCHES = sh(
-                      script: "jenkins/scripts/get_last_n_release_branches.sh ${CAPM3_GIT_URL} 2",
-                      returnStdout: true
-                    ).trim()
-                    .split('\\n')
-                    .findAll { branch -> branch }
+                        CAPM3_BRANCHES = sh(
+                          script: "jenkins/scripts/get_last_n_release_branches.sh ${CAPM3_GIT_URL} 2",
+                          returnStdout: true
+                        ).trim()
+                        .split('\\n')
+                        .findAll { branch -> branch }
 
-                    BMO_BRANCHES = sh(
-                      script: "jenkins/scripts/get_last_n_release_branches.sh ${BMO_GIT_URL} 2",
-                      returnStdout: true
-                    ).trim()
-                    .split('\\n')
-                    .findAll { branch -> branch }
+                        BMO_BRANCHES = sh(
+                          script: "jenkins/scripts/get_last_n_release_branches.sh ${BMO_GIT_URL} 2",
+                          returnStdout: true
+                        ).trim()
+                        .split('\\n')
+                        .findAll { branch -> branch }
 
-                    IPAM_BRANCHES = sh(
-                      script: "jenkins/scripts/get_last_n_release_branches.sh ${IPAM_GIT_URL} 2",
-                      returnStdout: true
-                    ).trim()
-                    .split('\\n')
-                    .findAll { branch -> branch }
+                        IPAM_BRANCHES = sh(
+                          script: "jenkins/scripts/get_last_n_release_branches.sh ${IPAM_GIT_URL} 2",
+                          returnStdout: true
+                        ).trim()
+                        .split('\\n')
+                        .findAll { branch -> branch }
 
-                    IRSO_BRANCHES = sh(
-                      script: "jenkins/scripts/get_last_n_release_branches.sh ${IRSO_GIT_URL} 2",
-                      returnStdout: true
-                    ).trim()
-                    .split('\\n')
-                    .findAll { branch -> branch }
+                        IRSO_BRANCHES = sh(
+                          script: "jenkins/scripts/get_last_n_release_branches.sh ${IRSO_GIT_URL} 2",
+                          returnStdout: true
+                        ).trim()
+                        .split('\\n')
+                        .findAll { branch -> branch }
 
-                    CAPM3_BRANCHES.add(mainBranch)
-                    BMO_BRANCHES.add(mainBranch)
-                    IPAM_BRANCHES.add(mainBranch)
-                    IRSO_BRANCHES.add(mainBranch)
+                        CAPM3_BRANCHES.add(mainBranch)
+                        BMO_BRANCHES.add(mainBranch)
+                        IPAM_BRANCHES.add(mainBranch)
+                        IRSO_BRANCHES.add(mainBranch)
 
-                    echo "CAPM3_BRANCHES=${CAPM3_BRANCHES}"
-                    echo "BMO_BRANCHES=${BMO_BRANCHES}"
-                    echo "IPAM_BRANCHES=${IPAM_BRANCHES}"
-                    echo "IRSO_BRANCHES=${IRSO_BRANCHES}"
+                        echo "CAPM3_BRANCHES=${CAPM3_BRANCHES}"
+                        echo "BMO_BRANCHES=${BMO_BRANCHES}"
+                        echo "IPAM_BRANCHES=${IPAM_BRANCHES}"
+                        echo "IRSO_BRANCHES=${IRSO_BRANCHES}"
 
-                    if (!CAPM3_BRANCHES || !BMO_BRANCHES || !IPAM_BRANCHES || !IRSO_BRANCHES) {
-                        error 'Failed to resolve one or more branch sets.'
+                        if (!CAPM3_BRANCHES || !BMO_BRANCHES || !IPAM_BRANCHES || !IRSO_BRANCHES) {
+                            error 'Failed to resolve one or more branch sets.'
+                        }
                     }
                 }
             }
@@ -379,15 +381,17 @@ pipeline {
         }
         stage('Resolve Go Version') {
             steps {
-                script {
-                    echo 'Resolving Go version from cluster-api-provider-metal3 (make go-version)'
-                    sh "rm -rf gover-capm3 && git clone --depth 1 ${CAPM3_GIT_URL} gover-capm3"
-                    def raw = sh(script: 'cd gover-capm3 && make go-version', returnStdout: true).trim()
-                    if (!raw) {
-                        error 'make go-version returned empty'
+                withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                    script {
+                        echo 'Resolving Go version from cluster-api-provider-metal3 (make go-version)'
+                        sh "rm -rf gover-capm3 && git clone --depth 1 ${CAPM3_GIT_URL} gover-capm3"
+                        def raw = sh(script: 'cd gover-capm3 && make go-version', returnStdout: true).trim()
+                        if (!raw) {
+                            error 'make go-version returned empty'
+                        }
+                        GO_VERSION = raw
+                        echo "Resolved GO_VERSION=${GO_VERSION}"
                     }
-                    GO_VERSION = raw
-                    echo "Resolved GO_VERSION=${GO_VERSION}"
                 }
             }
         }
@@ -418,21 +422,23 @@ pipeline {
                 GOPATH = "${env.WORKSPACE}/go"
             }
             steps {
-                script {
-                    sh 'mkdir -p results'
-                    def tasks = [:]
+                withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                    script {
+                        sh 'mkdir -p results'
+                        def tasks = [:]
 
-                    REPO_BRANCH_MAP.each { entry ->
-                        def repoEntry = entry
-                        tasks[repoEntry.name] = {
-                            repoEntry.branches.each { br ->
-                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    runOsvScan(repoEntry.name, 'branch', br, repoEntry.url, GO_VERSION, 'branch_scan_failures.txt')
+                        REPO_BRANCH_MAP.each { entry ->
+                            def repoEntry = entry
+                            tasks[repoEntry.name] = {
+                                repoEntry.branches.each { br ->
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                        runOsvScan(repoEntry.name, 'branch', br, repoEntry.url, GO_VERSION, 'branch_scan_failures.txt')
+                                    }
                                 }
                             }
                         }
+                        parallel tasks
                     }
-                    parallel tasks
                 }
             }
         }
@@ -443,21 +449,23 @@ pipeline {
                 GOPATH = "${env.WORKSPACE}/go"
             }
             steps {
-                script {
-                    sh 'mkdir -p results'
-                    def tasks = [:]
+                withCredentials([string(credentialsId: 'metal3-clusterctl-github-token', variable: 'GITHUB_TOKEN')]) {
+                    script {
+                        sh 'mkdir -p results'
+                        def tasks = [:]
 
-                    REPO_BRANCH_MAP.each { entry ->
-                        def repoEntry = entry
-                        tasks[repoEntry.name] = {
-                            repoEntry.tags.each { tg ->
-                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                                    runOsvScan(repoEntry.name, 'tag', tg, repoEntry.url, GO_VERSION, 'tag_scan_failures.txt')
+                        REPO_BRANCH_MAP.each { entry ->
+                            def repoEntry = entry
+                            tasks[repoEntry.name] = {
+                                repoEntry.tags.each { tg ->
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                                        runOsvScan(repoEntry.name, 'tag', tg, repoEntry.url, GO_VERSION, 'tag_scan_failures.txt')
+                                    }
                                 }
                             }
                         }
+                        parallel tasks
                     }
-                    parallel tasks
                 }
             }
         }
