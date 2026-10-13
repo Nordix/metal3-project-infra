@@ -16,6 +16,11 @@ currentBuild.description = """<a href='${GRAFANA_VIEW}'>View in log collector</a
 
 pipeline {
     environment {
+        // Select the optional tier through the ginkgo label filter.
+        GINKGO_LABEL_FILTER = 'optional'
+        // TODO: Remove once the BMO release branches that only understand
+        // GINKGO_FOCUS (release-0.12 - release-0.14) are no longer tested, and
+        // hack/ci-e2e.sh on main no longer derives the upgrade setup from it.
         GINKGO_FOCUS = "${GINKGO_FOCUS}"
         LOKI_URL = 'https://log.apps.staging.metal3.io/store/api/v1/push'
     }
